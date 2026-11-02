@@ -1,0 +1,36 @@
+name: mirror
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - images.txt
+      - mirror.sh
+      - .github/workflows/mirror.yaml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror
+
+jobs:
+  mirror:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write # the copies
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Log in to GHCR
+        env:
+          TOKEN: ${{ github.token }}
+        run: skopeo login ghcr.io --username "$GITHUB_ACTOR" --password-stdin <<<"$TOKEN"
+
+      - name: Copy the images
+        run: ./mirror.sh

@@ -1,0 +1,2 @@
+# Images to copy to ghcr.io/mciz/mirror/<image>, one per line.
+docker.io/library/busybox:1.38.0
